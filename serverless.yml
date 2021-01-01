@@ -49,7 +49,7 @@ functions:
       - httpApi:
           path: /user
           method: post
-  world:
+  createRecord:
     handler: dist/create_record
     events:
       - httpApi:
