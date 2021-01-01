@@ -1,4 +1,20 @@
 {
+  "name": "kontrolio-api",
+  "version": "0.0.0",
+  "main": "",
+  "author": "Marcelo Cardoso <marcelovicentegc@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "get": "GO111MODULE=on go get --",
+    "removeunused": "go mod tidy",
+    "build": "go build -o ./dist/main .",
+    "start": "yarn build && ./dist/main"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
   "devDependencies": {
     "@commitlint/cli": "^11.0.0",
     "@commitlint/config-conventional": "^11.0.0",
