@@ -1,3 +1,5 @@
+![Go](https://github.com/marcelovicentegc/kontrolio-api/workflows/Go/badge.svg)
+
 <p align="center">
   <img alt="kontrolio logo" src="../assets/logo.png" height="300" />
   <h3 align="center">kontrolio-api</h3>
