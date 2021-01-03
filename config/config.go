@@ -27,6 +27,5 @@ func init() {
 	DB_PASSWORD = os.Getenv("DB_PASSWORD")
 	DB_NAME = os.Getenv("DB_NAME")
 	DB_HOST = os.Getenv("DB_HOST")
-	DB_TYPE = "postgres"
 
 }
