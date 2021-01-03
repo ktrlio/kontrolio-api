@@ -2,24 +2,21 @@ service: kontrolio-api
 
 frameworkVersion: "2"
 
-useDotenv: true
-
 provider:
   name: aws
   runtime: go1.x
   lambdaHashingVersion: 20201221
   timeout: 10
+  environment:
+    ENV: production
+    DB_USER: ${ssm:/kontrolio-db-user~true}
+    DB_PASSWORD: ${ssm:/kontrolio-db-password~true}
+    DB_NAME: ${ssm:/kontrolio-db-name~true}
+    DB_HOST: ${ssm:/kontrolio-db-host~true}
+    DB_PORT: ${ssm:/kontrolio-db-port~true}
 
 package:
   individually: true
-
-environment:
-  ENV: production
-  DB_USER: ${ssm:/kontrolio-db-user~true}
-  DB_PASSWORD: ${ssm:/kontrolio-db-password~true}
-  DB_NAME: ${ssm:/kontrolio-db-name~true}
-  DB_HOST: ${ssm:/kontrolio-db-host~true}
-  DB_PORT: ${ssm:/kontrolio-db-port~true}
 
 functions:
   createUser:
