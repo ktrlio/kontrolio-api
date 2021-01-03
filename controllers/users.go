@@ -20,7 +20,24 @@ func CreateUser(ctx context.Context, data user) (utils.Response, error) {
 	var buf bytes.Buffer
 
 	if len(data.Password) < 8 {
-		return utils.Response{StatusCode: 400}, errors.New("Sorry, but the password must have at least 8 characters.")
+
+		body, err := json.Marshal(map[string]interface{}{
+			"message": "Sorry, but the password must have at least 8 characters.",
+		})
+
+		if err != nil {
+			return utils.Response{StatusCode: 404}, err
+		}
+
+		json.HTMLEscape(&buf, body)
+
+		return utils.Response{
+			StatusCode:      400,
+			IsBase64Encoded: false,
+			Body:            buf.String(),
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+			}}, errors.New("Sorry, but the password must have at least 8 characters.")
 	}
 
 	hashedPassword, err := utils.HashPassword(data.Password)
