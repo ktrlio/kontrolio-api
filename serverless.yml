@@ -13,6 +13,9 @@ provider:
 package:
   individually: true
 
+environment:
+  ENV: production
+
 functions:
   createUser:
     handler: dist/create_user
@@ -20,8 +23,6 @@ functions:
       - httpApi:
           path: /user
           method: post
-    environment:
-      keep: keep
     package:
       exclude:
         - ./**

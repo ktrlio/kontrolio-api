@@ -2,12 +2,10 @@ package database
 
 import (
 	"fmt"
-	"log"
-	"os"
 	"time"
 
 	"github.com/jinzhu/gorm"
-	"github.com/joho/godotenv"
+	"github.com/marcelovicentegc/kontrolio-api/config"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -29,20 +27,10 @@ type User struct {
 }
 
 func init() {
-	err := godotenv.Load()
+	connectionString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", config.DB_HOST, config.DB_USER, config.DB_NAME, config.DB_PASSWORD)
+
+	conn, err := gorm.Open(config.DB_TYPE, connectionString)
 	if err != nil {
-		log.Fatal(err)
-	}
-
-	DB_USER := os.Getenv("DB_USER")
-	DB_PASSWORD := os.Getenv("DB_PASSWORD")
-	DB_NAME := os.Getenv("DB_NAME")
-	DB_HOST := os.Getenv("DB_HOST")
-
-	connectionString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", DB_HOST, DB_USER, DB_NAME, DB_PASSWORD)
-
-	conn, e := gorm.Open("postgres", connectionString)
-	if e != nil {
 		fmt.Println(err)
 	}
 
