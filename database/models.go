@@ -23,6 +23,7 @@ type Record struct {
 type User struct {
 	gorm.Model
 	Uuid     uuid.UUID
+	ApiKey   string
 	Email    string
 	Password string
 }

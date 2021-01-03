@@ -1,4 +1,4 @@
-![Go](https://github.com/marcelovicentegc/kontrolio-api/workflows/Go/badge.svg)
+![Go](https://github.com/marcelovicentegc/kontrolio-api/workflows/Go/badge.svg) [![serverless](http://public.serverless.com/badges/v3.svg)](http://www.serverless.com)
 
 <p align="center">
   <img alt="kontrolio logo" src="../assets/logo.png" height="300" />

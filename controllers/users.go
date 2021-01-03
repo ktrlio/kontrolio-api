@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
+	"errors"
 
+	"github.com/marcelovicentegc/kontrolio-api/database"
 	"github.com/marcelovicentegc/kontrolio-api/utils"
 	uuid "github.com/satori/go.uuid"
 )
@@ -15,14 +16,33 @@ type user struct {
 	Password string `json:"password"`
 }
 
-func CreateUser(ctx context.Context, user user) (utils.Response, error) {
+func CreateUser(ctx context.Context, data user) (utils.Response, error) {
 	var buf bytes.Buffer
 
-	body, err := json.Marshal(map[string]interface{}{
-		"message": "Go Serverless v1.0! Your function executed successfully!",
-	})
+	if len(data.Password) < 8 {
+		return utils.Response{StatusCode: 400}, errors.New("Sorry, but the password must have at least 8 characters.")
+	}
+
+	hashedPassword, err := utils.HashPassword(data.Password)
+
+	if err != nil {
+		return utils.Response{StatusCode: 500}, err
+	}
 
 	apiKey := uuid.NewV4().String()
+
+	user := database.User{Email: data.Email, Password: hashedPassword, ApiKey: apiKey}
+
+	result := database.GetDB().Create(&user)
+
+	if result.Error != nil {
+		return utils.Response{StatusCode: 500}, result.Error
+	}
+
+	body, err := json.Marshal(map[string]interface{}{
+		"message": "Account successfully created!",
+		"apiKey":  apiKey,
+	})
 
 	if err != nil {
 		return utils.Response{StatusCode: 404}, err
@@ -30,16 +50,12 @@ func CreateUser(ctx context.Context, user user) (utils.Response, error) {
 
 	json.HTMLEscape(&buf, body)
 
-	fmt.Println(user.Email)
-	fmt.Println(apiKey)
-
 	resp := utils.Response{
 		StatusCode:      200,
 		IsBase64Encoded: false,
 		Body:            buf.String(),
 		Headers: map[string]string{
-			"Content-Type":           "application/json",
-			"X-MyCompany-Func-Reply": "hello-handler",
+			"Content-Type": "application/json",
 		},
 	}
 
