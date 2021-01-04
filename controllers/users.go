@@ -20,7 +20,6 @@ func CreateUser(ctx context.Context, data user) (utils.Response, error) {
 	var buf bytes.Buffer
 
 	if len(data.Password) < 8 {
-
 		body, err := json.Marshal(map[string]interface{}{
 			"message": "Sorry, but the password must have at least 8 characters.",
 		})

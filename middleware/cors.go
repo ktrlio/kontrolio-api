@@ -1,10 +1,12 @@
 package middleware
 
 import (
-	"net/http"
+	"github.com/marcelovicentegc/kontrolio-api/config"
+	"github.com/marcelovicentegc/kontrolio-api/utils"
 )
 
-func EnableCors(responseWriter *http.ResponseWriter) {
-	(*responseWriter).Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-	(*responseWriter).Header().Set("Access-Control-Allow-Credentials", "true")
+func EnableCors(response utils.Response) utils.Response {
+	response.Headers["Access-Control-Allow-Origin"] = config.CLIENT_URL
+	response.Headers["Access-Control-Allow-Credentials"] = "true"
+	return response
 }

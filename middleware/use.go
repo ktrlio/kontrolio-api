@@ -1,13 +1,12 @@
 package middleware
 
 import (
-	"net/http"
+	"github.com/marcelovicentegc/kontrolio-api/utils"
 )
 
-func UseMiddleware(f func(http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) {
-	return func(responseWriter http.ResponseWriter, request *http.Request) {
-		EnableCors(&responseWriter)
-		Authenticate(&responseWriter, request)
-		f(responseWriter, request)
+func UseMiddleware(f func(request utils.AuthRequest)) func(utils.AuthRequest) {
+	return func(request utils.AuthRequest) {
+		Authenticate(request)
+		f(request)
 	}
 }

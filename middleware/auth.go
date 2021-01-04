@@ -1,36 +1,42 @@
 package middleware
 
 import (
-	"net/http"
-	"os"
+	"errors"
 	"strings"
 
+	"github.com/aws/aws-lambda-go/events"
 	"github.com/marcelovicentegc/kontrolio-api/utils"
 )
 
-func Authenticate(responseWriter *http.ResponseWriter, request *http.Request) (http.ResponseWriter, http.Request) {
-	(*responseWriter).Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
+func generatePolicy(principalID, effect, resource string, context map[string]interface{}) utils.AuthResponse {
+	authResponse := utils.AuthResponse{PrincipalID: principalID}
 
-	token := strings.SplitN(request.Header.Get("Authorization"), " ", 2)
+	if effect != "" && resource != "" {
+		authResponse.PolicyDocument = events.APIGatewayCustomAuthorizerPolicy{
+			Version: "2012-10-17",
+			Statement: []events.IAMPolicyStatement{
+				{
+					Action:   []string{"execute-api:Invoke"},
+					Effect:   effect,
+					Resource: []string{resource},
+				},
+			},
+		}
+	}
+	authResponse.Context = context
+	return authResponse
+}
 
-	if len(token) != 2 {
-		http.Error((*responseWriter), "Not authorized", 401)
-		return (*responseWriter), *request
+func Authenticate(request utils.AuthRequest) (utils.AuthResponse, error) {
+	token := request.AuthorizationToken
+	tokenSlice := strings.Split(token, " ")
+	var bearerToken string
+	if len(tokenSlice) > 1 {
+		bearerToken = tokenSlice[len(tokenSlice)-1]
+	}
+	if bearerToken == "" {
+		return utils.AuthResponse{}, errors.New("Unauthorized")
 	}
 
-	pair := strings.SplitN(token[1], ":", 2)
-	if len(pair) != 2 {
-		http.Error((*responseWriter), "Not authorized", 401)
-		return (*responseWriter), *request
-	}
-
-	authKey := os.Getenv("AUTH_TOKEN_KEY")
-	authValue := os.Getenv("AUTH_TOKEN_VALUE")
-
-	if !utils.CheckPasswordHash(authKey, pair[0]) || !utils.CheckPasswordHash(authValue, pair[1]) {
-		http.Error((*responseWriter), "Not authorized", 401)
-		return (*responseWriter), *request
-	}
-
-	return (*responseWriter), *request
+	return generatePolicy("user", "Allow", request.MethodArn, map[string]interface{}{"name": bearerToken}), nil
 }

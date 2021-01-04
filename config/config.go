@@ -12,6 +12,7 @@ var DB_PASSWORD string
 var DB_NAME string
 var DB_HOST string
 var DB_TYPE string
+var CLIENT_URL string
 
 func init() {
 	ENV := os.Getenv("ENV")
@@ -27,5 +28,5 @@ func init() {
 	DB_PASSWORD = os.Getenv("DB_PASSWORD")
 	DB_NAME = os.Getenv("DB_NAME")
 	DB_HOST = os.Getenv("DB_HOST")
-
+	CLIENT_URL = os.Getenv("CLIENT_URL")
 }

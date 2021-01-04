@@ -15,6 +15,7 @@ provider:
     DB_NAME: ${ssm:/kontrolio-db-name~true}
     DB_HOST: ${ssm:/kontrolio-db-host~true}
     DB_PORT: ${ssm:/kontrolio-db-port~true}
+    CLIENT_URL: https://kontrolio.com
 
 package:
   individually: true

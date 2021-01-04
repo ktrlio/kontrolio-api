@@ -7,3 +7,7 @@ import "github.com/aws/aws-lambda-go/events"
 //
 // https://serverless.com/framework/docs/providers/aws/events/apigateway/#lambda-proxy-integration
 type Response events.APIGatewayProxyResponse
+type AuthResponse events.APIGatewayCustomAuthorizerResponse
+
+type Request events.APIGatewayProxyRequest
+type AuthRequest events.APIGatewayCustomAuthorizerRequest
