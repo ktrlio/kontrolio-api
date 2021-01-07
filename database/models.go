@@ -38,7 +38,7 @@ func init() {
 
 	db = conn
 
-	db.Debug().AutoMigrate(&Record{})
+	db.Debug().AutoMigrate(&Record{}, &User{})
 }
 
 // Returns a handle to the DB object
