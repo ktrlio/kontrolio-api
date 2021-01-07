@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 
+	"github.com/marcelovicentegc/kontrolio-api/config"
 	"github.com/marcelovicentegc/kontrolio-api/database"
 	"github.com/marcelovicentegc/kontrolio-api/utils"
 	uuid "github.com/satori/go.uuid"
@@ -65,6 +66,15 @@ func CreateUser(ctx context.Context, data user) (utils.Response, error) {
 	}
 
 	json.HTMLEscape(&buf, body)
+
+	if config.ENABLE_EMAIL_AUTH {
+		utils.SendEMail(
+			data.Email,
+			"Account creation",
+			"<h1>One more step ahead!</h1><br /><p>Click on the following URL to authenticate your account: "+"<a href="+"randomUrl"+"></a>"+"</p>",
+			"One more step ahead! Click or copy and paste the following URL to your browser to authenticate your account"+"randomUrl",
+			nil)
+	}
 
 	resp := utils.Response{
 		StatusCode:      200,
