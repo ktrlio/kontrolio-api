@@ -12,12 +12,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-type user struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-func CreateUser(ctx context.Context, data user) (utils.Response, error) {
+func CreateUser(ctx context.Context, data User) (utils.Response, error) {
 	var buf bytes.Buffer
 
 	if len(data.Password) < 8 {
@@ -38,6 +33,12 @@ func CreateUser(ctx context.Context, data user) (utils.Response, error) {
 			Headers: map[string]string{
 				"Content-Type": "application/json",
 			}}, errors.New("Sorry, but the password must have at least 8 characters.")
+	}
+
+	existentUser := utils.GetUser(data.Email)
+
+	if existentUser != nil {
+		return utils.Response{StatusCode: 500}, errors.New("Email already taken.")
 	}
 
 	hashedPassword, err := utils.HashPassword(data.Password)

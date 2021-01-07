@@ -9,13 +9,7 @@ import (
 	"github.com/marcelovicentegc/kontrolio-api/utils"
 )
 
-type record struct {
-	Time       string `json:"time"`
-	RecordType string `json:"recordType"`
-	ApiKey     string `json:"apiKey"`
-}
-
-func CreateRecord(ctx context.Context, record record) (utils.Response, error) {
+func CreateRecord(ctx context.Context, record Record) (utils.Response, error) {
 	var buf bytes.Buffer
 
 	body, err := json.Marshal(map[string]interface{}{
