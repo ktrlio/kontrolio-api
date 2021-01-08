@@ -10,14 +10,17 @@
 
 Kontrolio's API is ready to be served on AWS Lambda. To host it yourself, you just need to have a running Postgres database, clone this repo, and configure the following secrets ([as seen on the `env.example` file](../.env.example)):
 
-| Environment variable  | Description                     |
-| --------------------- | ------------------------------- |
-| DB_USER               | Databse user                    |
-| DB_PASSWORD           | Database user's password        |
-| DB_NAME               | Database name                   |
-| DB_HOST               | Database host                   |
-| AWS_ACCESS_KEY_ID     | Your AWS role access key ID     |
-| AWS_SECRET_ACCESS_KEY | Your AWS role secret access key |
+| Environment variable  | Type            | Description                                                           |
+| --------------------- | --------------- | --------------------------------------------------------------------- |
+| DB_USER               | `string`        | Databse user                                                          |
+| DB_PASSWORD           | `string`        | Database user's password                                              |
+| DB_NAME               | `string`        | Database name                                                         |
+| DB_HOST               | `string`        | Database host                                                         |
+| AWS_ACCESS_KEY_ID     | `string`        | Your AWS role access key ID                                           |
+| AWS_SECRET_ACCESS_KEY | `string`        | Your AWS role secret access key                                       |
+| CLIENT_URL            | `string`        | The client URL, needed because of CORS policy                         |
+| SENDER_EMAIL          | `string`        | Sender email (it's only used when ENABLE_EMAIL_AUTH is set to `true`) |
+| ENABLE_EMAIL_AUTH     | `bool` (0 or 1) | Email authentication feature flag                                     |
 
 Your AWS role must have the following permissions granted:
 
