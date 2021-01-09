@@ -2,12 +2,15 @@ service: kontrolio-api
 
 frameworkVersion: "2"
 
+useDotenv: true
+
 provider:
   name: aws
   runtime: go1.x
   lambdaHashingVersion: 20201221
   timeout: 2
   memorySize: 128
+  stage: dev
   environment:
     ENV: production
     DB_USER: ${ssm:/kontrolio-db-user~true}
@@ -45,3 +48,15 @@ functions:
         - ./**
       include:
         - ./dist/create_record
+
+plugins:
+  - serverless-offline-ssm
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort: 8000
+  serverless-offline-ssm:
+    stages:
+      - offline
+    file: .env
