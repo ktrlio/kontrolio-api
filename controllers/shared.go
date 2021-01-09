@@ -1,4 +1,4 @@
-package utils
+package controllers
 
 import (
 	"encoding/json"
@@ -6,11 +6,11 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 )
 
-type ErrorBody struct {
+type errorBody struct {
 	ErrorMsg *string `json:"error,omitempty"`
 }
 
-func ApiResponse(status int, body interface{}) (*events.APIGatewayProxyResponse, error) {
+func apiResponse(status int, body interface{}) (*events.APIGatewayProxyResponse, error) {
 	resp := events.APIGatewayProxyResponse{Headers: map[string]string{"Content-Type": "application/json"}}
 	resp.StatusCode = status
 

@@ -6,13 +6,14 @@ import (
 	"errors"
 
 	"github.com/aws/aws-lambda-go/events"
+	"github.com/marcelovicentegc/kontrolio-api/database"
 	"github.com/marcelovicentegc/kontrolio-api/utils"
 )
 
 func Login(ctx context.Context, data User) (events.APIGatewayProxyResponse, error) {
 	var buf bytes.Buffer
 
-	user := utils.GetUser(data.Email)
+	user := database.GetUser(data.Email)
 
 	if user == nil {
 		return events.APIGatewayProxyResponse{StatusCode: 200}, errors.New("User not found or incorrect password")

@@ -33,23 +33,23 @@ func CreateUser(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyRespo
 	data, err := parseUser(req.Body)
 
 	if err != nil {
-		return utils.ApiResponse(http.StatusBadRequest, utils.ErrorBody{aws.String("Sorry, something went wrong while parsing the request")})
+		return apiResponse(http.StatusBadRequest, errorBody{aws.String("Sorry, something went wrong while parsing the request")})
 	}
 
 	if len(data.Password) < 8 {
-		return utils.ApiResponse(http.StatusBadRequest, utils.ErrorBody{aws.String("Sorry, but the password must have at least 8 characters.")})
+		return apiResponse(http.StatusBadRequest, errorBody{aws.String("Sorry, but the password must have at least 8 characters.")})
 	}
 
-	existentUser := utils.GetUser(data.Email)
+	existentUser := database.GetUser(data.Email)
 
 	if existentUser != nil {
-		return utils.ApiResponse(http.StatusBadRequest, utils.ErrorBody{aws.String("Email already taken.")})
+		return apiResponse(http.StatusBadRequest, errorBody{aws.String("Email already taken.")})
 	}
 
 	hashedPassword, err := utils.HashPassword(data.Password)
 
 	if err != nil {
-		return utils.ApiResponse(http.StatusBadRequest, utils.ErrorBody{aws.String(err.Error())})
+		return apiResponse(http.StatusBadRequest, errorBody{aws.String(err.Error())})
 	}
 
 	apiKey := uuid.NewV4().String()
@@ -59,7 +59,7 @@ func CreateUser(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyRespo
 	result := database.GetDB().Create(&user)
 
 	if result.Error != nil {
-		return utils.ApiResponse(http.StatusBadRequest, utils.ErrorBody{aws.String(result.Error.Error())})
+		return apiResponse(http.StatusBadRequest, errorBody{aws.String(result.Error.Error())})
 	}
 
 	if config.ENABLE_EMAIL_AUTH {
@@ -71,5 +71,5 @@ func CreateUser(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyRespo
 			nil)
 	}
 
-	return utils.ApiResponse(http.StatusOK, result)
+	return apiResponse(http.StatusOK, result)
 }
