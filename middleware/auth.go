@@ -5,11 +5,10 @@ import (
 	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/marcelovicentegc/kontrolio-api/utils"
 )
 
-func generatePolicy(principalID, effect, resource string, context map[string]interface{}) utils.AuthResponse {
-	authResponse := utils.AuthResponse{PrincipalID: principalID}
+func generatePolicy(principalID, effect, resource string, context map[string]interface{}) events.APIGatewayCustomAuthorizerResponse {
+	authResponse := events.APIGatewayCustomAuthorizerResponse{PrincipalID: principalID}
 
 	if effect != "" && resource != "" {
 		authResponse.PolicyDocument = events.APIGatewayCustomAuthorizerPolicy{
@@ -27,7 +26,7 @@ func generatePolicy(principalID, effect, resource string, context map[string]int
 	return authResponse
 }
 
-func Authenticate(request utils.AuthRequest) (utils.AuthResponse, error) {
+func Authenticate(request events.APIGatewayCustomAuthorizerRequest) (events.APIGatewayCustomAuthorizerResponse, error) {
 	token := request.AuthorizationToken
 	tokenSlice := strings.Split(token, " ")
 	var bearerToken string
@@ -35,7 +34,7 @@ func Authenticate(request utils.AuthRequest) (utils.AuthResponse, error) {
 		bearerToken = tokenSlice[len(tokenSlice)-1]
 	}
 	if bearerToken == "" {
-		return utils.AuthResponse{}, errors.New("Unauthorized")
+		return events.APIGatewayCustomAuthorizerResponse{}, errors.New("Unauthorized")
 	}
 
 	return generatePolicy("user", "Allow", request.MethodArn, map[string]interface{}{"name": bearerToken}), nil

@@ -1,13 +1,20 @@
 package utils
 
-import "github.com/aws/aws-lambda-go/events"
+import (
+	"encoding/json"
 
-// Response is of type APIGatewayProxyResponse since we're leveraging the
-// AWS Lambda Proxy Request functionality (default behavior)
-//
-// https://serverless.com/framework/docs/providers/aws/events/apigateway/#lambda-proxy-integration
-type Response events.APIGatewayProxyResponse
-type AuthResponse events.APIGatewayCustomAuthorizerResponse
+	"github.com/aws/aws-lambda-go/events"
+)
 
-type Request events.APIGatewayProxyRequest
-type AuthRequest events.APIGatewayCustomAuthorizerRequest
+type ErrorBody struct {
+	ErrorMsg *string `json:"error,omitempty"`
+}
+
+func ApiResponse(status int, body interface{}) (*events.APIGatewayProxyResponse, error) {
+	resp := events.APIGatewayProxyResponse{Headers: map[string]string{"Content-Type": "application/json"}}
+	resp.StatusCode = status
+
+	stringBody, _ := json.Marshal(body)
+	resp.Body = string(stringBody)
+	return &resp, nil
+}

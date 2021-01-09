@@ -1,50 +1,36 @@
 package controllers
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"errors"
+	"net/http"
 
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/marcelovicentegc/kontrolio-api/config"
 	"github.com/marcelovicentegc/kontrolio-api/database"
 	"github.com/marcelovicentegc/kontrolio-api/utils"
 	uuid "github.com/satori/go.uuid"
 )
 
-func CreateUser(ctx context.Context, data User) (utils.Response, error) {
-	var buf bytes.Buffer
+func CreateUser(ctx context.Context, data User) (*events.APIGatewayProxyResponse, error) {
+	if data == (User{}) {
+		return utils.ApiResponse(http.StatusBadRequest, utils.ErrorBody{aws.String("Sorry, but you must provide a email and a password.")})
+	}
 
 	if len(data.Password) < 8 {
-		body, err := json.Marshal(map[string]interface{}{
-			"message": "Sorry, but the password must have at least 8 characters.",
-		})
-
-		if err != nil {
-			return utils.Response{StatusCode: 404}, err
-		}
-
-		json.HTMLEscape(&buf, body)
-
-		return utils.Response{
-			StatusCode:      400,
-			IsBase64Encoded: false,
-			Body:            buf.String(),
-			Headers: map[string]string{
-				"Content-Type": "application/json",
-			}}, errors.New("Sorry, but the password must have at least 8 characters.")
+		return utils.ApiResponse(http.StatusBadRequest, utils.ErrorBody{aws.String("Sorry, but the password must have at least 8 characters.")})
 	}
 
 	existentUser := utils.GetUser(data.Email)
 
 	if existentUser != nil {
-		return utils.Response{StatusCode: 500}, errors.New("Email already taken.")
+		return utils.ApiResponse(http.StatusBadRequest, utils.ErrorBody{aws.String("Email already taken.")})
 	}
 
 	hashedPassword, err := utils.HashPassword(data.Password)
 
 	if err != nil {
-		return utils.Response{StatusCode: 500}, err
+		return utils.ApiResponse(http.StatusBadRequest, utils.ErrorBody{aws.String(err.Error())})
 	}
 
 	apiKey := uuid.NewV4().String()
@@ -54,19 +40,8 @@ func CreateUser(ctx context.Context, data User) (utils.Response, error) {
 	result := database.GetDB().Create(&user)
 
 	if result.Error != nil {
-		return utils.Response{StatusCode: 500}, result.Error
+		return utils.ApiResponse(http.StatusBadRequest, utils.ErrorBody{aws.String(result.Error.Error())})
 	}
-
-	body, err := json.Marshal(map[string]interface{}{
-		"message": "Account successfully created!",
-		"apiKey":  apiKey,
-	})
-
-	if err != nil {
-		return utils.Response{StatusCode: 404}, err
-	}
-
-	json.HTMLEscape(&buf, body)
 
 	if config.ENABLE_EMAIL_AUTH {
 		utils.SendEMail(
@@ -77,14 +52,5 @@ func CreateUser(ctx context.Context, data User) (utils.Response, error) {
 			nil)
 	}
 
-	resp := utils.Response{
-		StatusCode:      200,
-		IsBase64Encoded: false,
-		Body:            buf.String(),
-		Headers: map[string]string{
-			"Content-Type": "application/json",
-		},
-	}
-
-	return resp, nil
+	return utils.ApiResponse(http.StatusOK, result)
 }

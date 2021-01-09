@@ -1,11 +1,9 @@
 package middleware
 
-import (
-	"github.com/marcelovicentegc/kontrolio-api/utils"
-)
+import "github.com/aws/aws-lambda-go/events"
 
-func UseMiddleware(f func(request utils.AuthRequest)) func(utils.AuthRequest) {
-	return func(request utils.AuthRequest) {
+func UseMiddleware(f func(request events.APIGatewayCustomAuthorizerRequest)) func(events.APIGatewayCustomAuthorizerRequest) {
+	return func(request events.APIGatewayCustomAuthorizerRequest) {
 		Authenticate(request)
 		f(request)
 	}
