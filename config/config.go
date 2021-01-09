@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -23,6 +24,7 @@ func init() {
 	ENV := os.Getenv("ENV")
 
 	if ENV != "production" {
+		fmt.Println("============== DEVELOPMENT MODE ==============")
 		err := godotenv.Load()
 		if err != nil {
 			log.Fatal(err)

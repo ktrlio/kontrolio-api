@@ -8,7 +8,7 @@
     "get": "GO111MODULE=on go get --",
     "removeunused": "go mod tidy",
     "build": "make",
-    "start": "yarn build && cd dist && yarn serverless offline --useDocker",
+    "start": "yarn build && cd dist && yarn serverless --stage dev offline --useDocker",
     "serverless": "serverless"
   },
   "husky": {

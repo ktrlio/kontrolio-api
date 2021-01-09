@@ -10,15 +10,15 @@ provider:
   lambdaHashingVersion: 20201221
   timeout: 2
   memorySize: 128
-  stage: dev
+  stage: prod
   environment:
-    ENV: production
-    DB_USER: ${ssm:/kontrolio-db-user~true}
-    DB_PASSWORD: ${ssm:/kontrolio-db-password~true}
-    DB_NAME: ${ssm:/kontrolio-db-name~true}
-    DB_HOST: ${ssm:/kontrolio-db-host~true}
-    DB_PORT: ${ssm:/kontrolio-db-port~true}
-    SENDER_EMAIL: ${ssm:/kontrolio-sender-email~true}
+    ENV: ${self:custom.envVariables.ENV.${self:custom.currentStage}}
+    DB_USER: ${self:custom.envVariables.DB_USER.${self:custom.currentStage}}
+    DB_PASSWORD: ${self:custom.envVariables.DB_PASSWORD.${self:custom.currentStage}}
+    DB_NAME: ${self:custom.envVariables.DB_NAME.${self:custom.currentStage}}
+    DB_HOST: ${self:custom.envVariables.DB_HOST.${self:custom.currentStage}}
+    DB_PORT: ${self:custom.envVariables.DB_PORT.${self:custom.currentStage}}
+    SENDER_EMAIL: ${self:custom.envVariables.SENDER_EMAIL.${self:custom.currentStage}}
     ENABLE_EMAIL_AUTH: 0
     CLIENT_URL: https://kontrolio.com
 
@@ -50,13 +50,25 @@ functions:
         - ./dist/create_record
 
 plugins:
-  - serverless-offline-ssm
   - serverless-offline
 
 custom:
+  currentStage: ${opt:stage, self:provider.stage}
+  envVariables:
+    ENV:
+      prod: production
+      dev: development
+    DB_USER:
+      prod: ${ssm:/kontrolio-db-user~true}
+    DB_PASSWORD:
+      prod: ${ssm:/kontrolio-db-password~true}
+    DB_NAME:
+      prod: ${ssm:/kontrolio-db-name~true}
+    DB_HOST:
+      prod: ${ssm:/kontrolio-db-host~true}
+    DB_PORT:
+      prod: ${ssm:/kontrolio-db-port~true}
+    SENDER_EMAIL:
+      prod: ${ssm:/kontrolio-sender-email~true}
   serverless-offline:
     httpPort: 9000
-  serverless-offline-ssm:
-    stages:
-      - offline
-    file: .env
