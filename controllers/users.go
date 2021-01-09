@@ -1,7 +1,8 @@
 package controllers
 
 import (
-	"context"
+	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -12,9 +13,27 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-func CreateUser(ctx context.Context, data User) (*events.APIGatewayProxyResponse, error) {
-	if data == (User{}) {
-		return utils.ApiResponse(http.StatusBadRequest, utils.ErrorBody{aws.String("Sorry, but you must provide a email and a password.")})
+type User struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+func parseUser(body string) (*User, error) {
+	user := &User{}
+	err := json.Unmarshal([]byte(body), user)
+
+	if err != nil {
+		return nil, errors.New("Sorry, something went wrong while parsing the request.")
+	}
+
+	return user, nil
+}
+
+func CreateUser(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+	data, err := parseUser(req.Body)
+
+	if err != nil {
+		return utils.ApiResponse(http.StatusBadRequest, utils.ErrorBody{aws.String("Sorry, something went wrong while parsing the request")})
 	}
 
 	if len(data.Password) < 8 {
