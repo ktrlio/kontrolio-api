@@ -19,6 +19,7 @@ provider:
     DB_HOST: ${self:custom.envVariables.DB_HOST.${self:custom.currentStage}}
     DB_PORT: ${self:custom.envVariables.DB_PORT.${self:custom.currentStage}}
     SENDER_EMAIL: ${self:custom.envVariables.SENDER_EMAIL.${self:custom.currentStage}}
+    JWT_SECRET: ${self:custom.envVariables.JWT_SECRET.${self:custom.currentStage}}
     ENABLE_EMAIL_AUTH: 0
     CLIENT_URL: https://kontrolio.com
 
@@ -43,6 +44,7 @@ functions:
         - ./**
       include:
         - ./dist/create_user
+
   createRecord:
     handler: dist/create_record
     events:
@@ -54,6 +56,25 @@ functions:
         - ./**
       include:
         - ./dist/create_record
+
+  login:
+    handler: dist/login
+    events:
+      - httpApi:
+          path: /login
+          method: post
+          authorizers:
+            authorizer:
+              audience:
+                # https://github.com/dherault/serverless-offline/issues/1078#issuecomment-729681919
+                - abcxxxxxxx
+                - abcxxxxxxx
+    package:
+      exclude:
+        - ./**
+      include:
+        - ./dist/login
+
   authorizer:
     handler: dist/authorizer
 
@@ -78,6 +99,8 @@ custom:
       prod: ${ssm:/kontrolio-db-port~true}
     SENDER_EMAIL:
       prod: ${ssm:/kontrolio-sender-email~true}
+    JWT_SECRET:
+      prod: ${ssm:/kontrolio-jwt-secret~true}
   serverless-offline:
     ignoreJWTSignature: true
     httpPort: 9000

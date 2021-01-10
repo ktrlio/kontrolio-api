@@ -8,7 +8,7 @@
 
 ### Development
 
-- Make sure you have Docker installed and running on your machine, as the `serverless-offline` plugin needs to spin a container.
+- Make sure you have Docker installed and running on your machine, as the `serverless-offline` plugin needs it to spin its container.
 - Set the following secrets ([as seen on the `env.example` file](../.env.example)):
 
 | Environment variable  | Type            | Description                                                           |
@@ -22,6 +22,7 @@
 | CLIENT_URL            | `string`        | The client URL, needed because of CORS policy                         |
 | SENDER_EMAIL          | `string`        | Sender email (it's only used when ENABLE_EMAIL_AUTH is set to `true`) |
 | ENABLE_EMAIL_AUTH     | `bool` (0 or 1) | Email authentication feature flag                                     |
+| JWT_SECRET            | `string`        | JWT secret key                                                        |
 
 ## 🖥️ Hosting
 
