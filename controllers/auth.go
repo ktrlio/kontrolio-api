@@ -131,5 +131,5 @@ func Login(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, 
 		return apiResponse(http.StatusBadGateway, errorBody{aws.String("Sorry, something went wrong on our end.")})
 	}
 
-	return apiResponse(http.StatusOK, token)
+	return apiResponse(http.StatusOK, responseBody{token})
 }

@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
-	"errors"
 	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -12,22 +10,6 @@ import (
 	"github.com/marcelovicentegc/kontrolio-api/utils"
 	uuid "github.com/satori/go.uuid"
 )
-
-type User struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-func parseUser(body string) (*User, error) {
-	user := &User{}
-	err := json.Unmarshal([]byte(body), user)
-
-	if err != nil {
-		return nil, errors.New("Sorry, something went wrong while parsing the request.")
-	}
-
-	return user, nil
-}
 
 func CreateUser(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	data, err := parseUser(req.Body)
@@ -71,5 +53,5 @@ func CreateUser(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyRespo
 			nil)
 	}
 
-	return apiResponse(http.StatusOK, aws.String(apiKey))
+	return apiResponse(http.StatusOK, responseBody{aws.String(apiKey)})
 }
