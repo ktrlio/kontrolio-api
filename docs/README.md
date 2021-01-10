@@ -6,9 +6,10 @@
   <p align="center">Time clock, clock card machine, punch clock, or time recorder API.</p>
 </p>
 
-## 🖥️ Hosting
+### Development
 
-Kontrolio's API is ready to be served on AWS Lambda. To host it yourself, you just need to have a running Postgres database, clone this repo, and configure the following secrets ([as seen on the `env.example` file](../.env.example)):
+- Make sure you have Docker installed and running on your machine, as the `serverless-offline` plugin needs to spin a container.
+- Set the following secrets ([as seen on the `env.example` file](../.env.example)):
 
 | Environment variable  | Type            | Description                                                           |
 | --------------------- | --------------- | --------------------------------------------------------------------- |
@@ -21,6 +22,10 @@ Kontrolio's API is ready to be served on AWS Lambda. To host it yourself, you ju
 | CLIENT_URL            | `string`        | The client URL, needed because of CORS policy                         |
 | SENDER_EMAIL          | `string`        | Sender email (it's only used when ENABLE_EMAIL_AUTH is set to `true`) |
 | ENABLE_EMAIL_AUTH     | `bool` (0 or 1) | Email authentication feature flag                                     |
+
+## 🖥️ Hosting
+
+Kontrolio's API is ready to be served on AWS Lambda. To host it yourself, you need to have a running Postgres database and access to the AWS console to configure the SSM and SES services.
 
 Your AWS role must have the following permissions granted:
 
