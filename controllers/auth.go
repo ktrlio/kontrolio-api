@@ -85,7 +85,7 @@ func signToken(email string) (*string, error) {
 	return &tokenString, nil
 }
 
-func validateToken(tokenString string) {
+func validateToken(tokenString string) (*string, error) {
 	// Parse takes the token string and a function for looking up the key. The latter is especially
 	// useful if you use multiple keys for your application.  The standard is to use 'kid' in the
 	// head of the token to identify which key to use, but the parsed token (head and claims) is provided
@@ -93,16 +93,20 @@ func validateToken(tokenString string) {
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			return nil, errors.New(fmt.Sprintf("Unexpected signing method: %v", token.Header["alg"]))
 		}
 
 		return config.JWT_SECRET, nil
 	})
 
+	if err != nil {
+		return nil, errors.New("Unauthorized")
+	}
+
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		fmt.Println(claims["email"])
+		return claims["email"].(*string), nil
 	} else {
-		fmt.Println(err)
+		return nil, errors.New("Unauthorized")
 	}
 }
 
