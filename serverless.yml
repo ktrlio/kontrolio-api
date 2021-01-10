@@ -32,6 +32,12 @@ functions:
       - httpApi:
           path: /user
           method: post
+          authorizers:
+            authorizer:
+              audience:
+                # https://github.com/dherault/serverless-offline/issues/1078#issuecomment-729681919
+                - abcxxxxxxx
+                - abcxxxxxxx
     package:
       exclude:
         - ./**
@@ -48,6 +54,8 @@ functions:
         - ./**
       include:
         - ./dist/create_record
+  authorizer:
+    handler: dist/authorizer
 
 plugins:
   - serverless-offline
@@ -71,4 +79,5 @@ custom:
     SENDER_EMAIL:
       prod: ${ssm:/kontrolio-sender-email~true}
   serverless-offline:
+    ignoreJWTSignature: true
     httpPort: 9000

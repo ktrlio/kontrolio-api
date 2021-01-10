@@ -71,5 +71,5 @@ func CreateUser(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyRespo
 			nil)
 	}
 
-	return apiResponse(http.StatusOK, result)
+	return apiResponse(http.StatusOK, aws.String(apiKey))
 }
