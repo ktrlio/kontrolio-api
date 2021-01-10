@@ -75,6 +75,24 @@ functions:
       include:
         - ./dist/login
 
+  get_api_key:
+    handler: dist/get_api_key
+    events:
+      - httpApi:
+          path: /api-key
+          method: post
+          authorizers:
+            authorizer:
+              audience:
+                # https://github.com/dherault/serverless-offline/issues/1078#issuecomment-729681919
+                - abcxxxxxxx
+                - abcxxxxxxx
+    package:
+      exclude:
+        - ./**
+      include:
+        - ./dist/get_api_key
+
   authorizer:
     handler: dist/authorizer
 

@@ -110,6 +110,22 @@ func validateToken(tokenString string) (*string, error) {
 	}
 }
 
+func isLoggedIn(req events.APIGatewayProxyRequest) (*string, error) {
+	jwtToken, err := parseKey(req.Body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	email, err := validateToken(*jwtToken)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return email, nil
+}
+
 func Login(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	data, err := parseUser(req.Body)
 
@@ -136,4 +152,20 @@ func Login(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, 
 	}
 
 	return apiResponse(http.StatusOK, responseBody{token})
+}
+
+func GetApiKey(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+	email, err := isLoggedIn(req)
+
+	if err != nil {
+		return apiResponse(http.StatusBadGateway, errorBody{aws.String(err.Error())})
+	}
+
+	user := database.GetUser(*email)
+
+	if user == nil {
+		return apiResponse(http.StatusBadRequest, errorBody{aws.String("User not found.")})
+	}
+
+	return apiResponse(http.StatusOK, responseBody{aws.String(user.ApiKey)})
 }
