@@ -24,6 +24,8 @@
 | ENABLE_EMAIL_AUTH     | `bool` (0 or 1) | Email authentication feature flag                                     |
 | JWT_SECRET            | `string`        | JWT secret key                                                        |
 
+- Finally, start the application: `yarn start`
+
 ## 🖥️ Hosting
 
 Kontrolio's API is ready to be served on AWS Lambda. To host it yourself, you need to have a running Postgres database and access to the AWS console to configure the SSM and SES services.

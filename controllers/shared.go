@@ -39,15 +39,3 @@ func parseUser(body string) (*User, error) {
 
 	return user, nil
 }
-
-// Parses both the API key and the JWT.
-func parseKey(body string) (*string, error) {
-	var key *string
-	err := json.Unmarshal([]byte(body), key)
-
-	if err != nil {
-		return nil, errors.New("Sorry, something went wrong while parsing the request.")
-	}
-
-	return key, nil
-}

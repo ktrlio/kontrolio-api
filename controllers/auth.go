@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -86,38 +87,35 @@ func signToken(email string) (*string, error) {
 }
 
 func validateToken(tokenString string) (*string, error) {
-	// Parse takes the token string and a function for looking up the key. The latter is especially
-	// useful if you use multiple keys for your application.  The standard is to use 'kid' in the
-	// head of the token to identify which key to use, but the parsed token (head and claims) is provided
-	// to the callback, providing flexibility.
-	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
-		// Don't forget to validate the alg is what you expect:
+	parsedToken, err := strconv.Unquote(tokenString)
+
+	if err != nil {
+		return nil, errors.New("Something went wrong while parsing your token.")
+	}
+
+	claims := &CustomClaims{}
+
+	_, err = jwt.ParseWithClaims(parsedToken, claims, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New(fmt.Sprintf("Unexpected signing method: %v", token.Header["alg"]))
 		}
 
-		return config.JWT_SECRET, nil
+		return []byte(config.JWT_SECRET), nil
 	})
 
 	if err != nil {
-		return nil, errors.New("Unauthorized")
+		if err == jwt.ErrSignatureInvalid {
+			return nil, errors.New("Unauthorized.")
+		}
+
+		return nil, errors.New("Sorry, something went wrong on our end.")
 	}
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		return claims["email"].(*string), nil
-	} else {
-		return nil, errors.New("Unauthorized")
-	}
+	return &claims.Email, nil
 }
 
 func isLoggedIn(req events.APIGatewayProxyRequest) (*string, error) {
-	jwtToken, err := parseKey(req.Body)
-
-	if err != nil {
-		return nil, err
-	}
-
-	email, err := validateToken(*jwtToken)
+	email, err := validateToken(req.Body)
 
 	if err != nil {
 		return nil, err
