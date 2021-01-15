@@ -20,6 +20,10 @@ type User struct {
 	Password string `json:"password"`
 }
 
+type userResponse struct {
+	Data User `json:"data"`
+}
+
 func apiResponse(status int, body interface{}) (*events.APIGatewayProxyResponse, error) {
 	resp := events.APIGatewayProxyResponse{Headers: map[string]string{"Content-Type": "application/json"}}
 	resp.StatusCode = status
@@ -30,12 +34,12 @@ func apiResponse(status int, body interface{}) (*events.APIGatewayProxyResponse,
 }
 
 func parseUser(body string) (*User, error) {
-	user := &User{}
-	err := json.Unmarshal([]byte(body), user)
+	data := &userResponse{}
+	err := json.Unmarshal([]byte(body), data)
 
 	if err != nil {
 		return nil, errors.New("Sorry, something went wrong while parsing the request.")
 	}
 
-	return user, nil
+	return &data.Data, nil
 }
