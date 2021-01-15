@@ -59,5 +59,7 @@ func CreateUser(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyRespo
 		return apiResponse(http.StatusBadRequest, errorBody{aws.String(err.Error())})
 	}
 
-	return apiResponse(http.StatusCreated, responseBody{token})
+	secret := Secret{secretString: *token}
+
+	return apiResponse(http.StatusCreated, secretResponse{secret})
 }
