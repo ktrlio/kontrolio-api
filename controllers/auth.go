@@ -115,7 +115,13 @@ func validateToken(tokenString string) (*string, error) {
 }
 
 func isLoggedIn(req events.APIGatewayProxyRequest) (*string, error) {
-	email, err := validateToken(req.Body)
+	data, err := parseSecret(req.Body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	email, err := validateToken(data.secretString)
 
 	if err != nil {
 		return nil, err
@@ -149,7 +155,11 @@ func Login(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, 
 		return apiResponse(http.StatusBadGateway, errorBody{aws.String("Sorry, something went wrong on our end.")})
 	}
 
-	return apiResponse(http.StatusOK, responseBody{token})
+	secret := Secret{
+		secretString: *token,
+	}
+
+	return apiResponse(http.StatusOK, secretResponse{secret})
 }
 
 func GetApiKey(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
@@ -165,5 +175,9 @@ func GetApiKey(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyRespon
 		return apiResponse(http.StatusBadRequest, errorBody{aws.String("User not found.")})
 	}
 
-	return apiResponse(http.StatusOK, responseBody{aws.String(user.ApiKey)})
+	secret := Secret{
+		secretString: user.ApiKey,
+	}
+
+	return apiResponse(http.StatusOK, secretResponse{secret})
 }

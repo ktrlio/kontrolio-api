@@ -59,5 +59,5 @@ func CreateUser(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyRespo
 		return apiResponse(http.StatusBadRequest, errorBody{aws.String(err.Error())})
 	}
 
-	return apiResponse(http.StatusOK, responseBody{token})
+	return apiResponse(http.StatusCreated, responseBody{token})
 }

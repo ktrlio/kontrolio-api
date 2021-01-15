@@ -24,6 +24,14 @@ type userResponse struct {
 	Data User `json:"data"`
 }
 
+type Secret struct {
+	secretString string
+}
+
+type secretResponse struct {
+	Data Secret `json:"data"`
+}
+
 func apiResponse(status int, body interface{}) (*events.APIGatewayProxyResponse, error) {
 	resp := events.APIGatewayProxyResponse{Headers: map[string]string{"Content-Type": "application/json"}}
 	resp.StatusCode = status
@@ -35,6 +43,17 @@ func apiResponse(status int, body interface{}) (*events.APIGatewayProxyResponse,
 
 func parseUser(body string) (*User, error) {
 	data := &userResponse{}
+	err := json.Unmarshal([]byte(body), data)
+
+	if err != nil {
+		return nil, errors.New("Sorry, something went wrong while parsing the request.")
+	}
+
+	return &data.Data, nil
+}
+
+func parseSecret(body string) (*Secret, error) {
+	data := &secretResponse{}
 	err := json.Unmarshal([]byte(body), data)
 
 	if err != nil {
