@@ -27,6 +27,14 @@ package:
   individually: true
 
 functions:
+  migrations:
+    handler: dist/migrations
+    package:
+      exclude:
+        - ./**
+      include:
+        - ./dist/migrations
+
   createUser:
     handler: dist/create_user
     events:
@@ -98,6 +106,7 @@ functions:
 
 plugins:
   - serverless-offline
+  - serverless-plugin-scripts
 
 custom:
   currentStage: ${opt:stage, self:provider.stage}
@@ -122,3 +131,6 @@ custom:
   serverless-offline:
     ignoreJWTSignature: true
     httpPort: 9000
+  scripts:
+    hooks:
+      "deploy:migrate": serverless invoke -f migrate

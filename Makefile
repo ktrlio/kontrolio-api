@@ -1,6 +1,7 @@
 .PHONY: build clean deploy
 
 build:
+	env CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o dist/migrations functions/migrations/migrations.go
 	env CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o dist/authorizer functions/authorizer/authorizer.go
 	env CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o dist/login functions/login/login.go
 	env CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o dist/get_api_key functions/get_api_key/get_api_key.go

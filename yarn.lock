@@ -5050,6 +5050,11 @@ serverless-offline@^6.8.0:
     velocityjs "^2.0.0"
     ws "^7.2.1"
 
+serverless-plugin-scripts@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/serverless-plugin-scripts/-/serverless-plugin-scripts-1.0.2.tgz#21808c3cfd0a1a84e48c0660b0f6f370b5665486"
+  integrity sha1-IYCMPP0KGoTkjAZgsPbzcLVmVIY=
+
 serverless@^2.17.0:
   version "2.17.0"
   resolved "https://registry.yarnpkg.com/serverless/-/serverless-2.17.0.tgz#bd312a23fdaec346e2eb4c66f4f35ade5ceac2cf"

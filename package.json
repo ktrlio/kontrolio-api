@@ -8,8 +8,9 @@
     "get": "GO111MODULE=on go get --",
     "removeunused": "go mod tidy",
     "build": "make",
-    "start": "yarn build && cd dist && yarn serverless --stage dev offline --useDocker",
-    "serverless": "serverless"
+    "serverless": "serverless",
+    "migrate": "yarn serverless invoke --function migrations",
+    "start": "yarn build && cd dist && yarn migrate && yarn serverless --stage dev offline --useDocker"
   },
   "husky": {
     "hooks": {
@@ -24,6 +25,7 @@
     "serverless-offline-ssm": "^5.2.0"
   },
   "dependencies": {
-    "serverless": "^2.17.0"
+    "serverless": "^2.17.0",
+    "serverless-plugin-scripts": "^1.0.2"
   }
 }
