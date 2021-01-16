@@ -38,3 +38,23 @@ Your AWS role must have the following permissions granted:
 - AmazonAPIGatewayAdministrator
 - AWSCloudFormationFullAccess
 - AWSLambda_FullAccess
+
+### Configuration
+
+On the AWS console, navigate to `Systems Manager > Application Management > Parameter Store` and set the following secrets with your production credentials, just as you did while developing it:
+
+| Variable name          | Type           | Description                                                           |
+| ---------------------- | -------------- | --------------------------------------------------------------------- |
+| kontrolio-db-user      | `SecureString` | Databse user                                                          |
+| kontrolio-db-password  | `SecureString` | Database user's password                                              |
+| kontrolio-db-name      | `SecureString` | Database name                                                         |
+| kontrolio-db-host      | `SecureString` | Database host                                                         |
+| kontrolio-sender-email | `SecureString` | Sender email (it's only used when ENABLE_EMAIL_AUTH is set to `true`) |
+| kontrolio-jwt-secret   | `SecureString` | JWT secret key                                                        |
+
+On your pipeline, you'll need the AWS keys to deploy, thus, set:
+
+| Environment variable  | Type     | Description                     |
+| --------------------- | -------- | ------------------------------- |
+| AWS_ACCESS_KEY_ID     | `string` | Your AWS role access key ID     |
+| AWS_SECRET_ACCESS_KEY | `string` | Your AWS role secret access key |
