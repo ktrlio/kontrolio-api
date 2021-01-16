@@ -134,4 +134,4 @@ custom:
     httpPort: 9000
   scripts:
     hooks:
-      "deploy:runMigrations": serverless invoke -f migrations
+      "deploy:finalize": serverless invoke -f migrations
