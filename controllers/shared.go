@@ -25,7 +25,7 @@ type userResponse struct {
 }
 
 type Secret struct {
-	secretString string
+	SecretString string `json:"secretString"`
 }
 
 type secretResponse struct {
@@ -52,13 +52,13 @@ func parseUser(body string) (*User, error) {
 	return &data.Data, nil
 }
 
-func parseSecret(body string) (*Secret, error) {
-	data := &secretResponse{}
+func parseSecret(body string) (*string, error) {
+	data := &responseBody{}
 	err := json.Unmarshal([]byte(body), data)
 
 	if err != nil {
 		return nil, errors.New("Sorry, something went wrong while parsing the request.")
 	}
 
-	return &data.Data, nil
+	return data.Data, nil
 }

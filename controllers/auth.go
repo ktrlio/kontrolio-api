@@ -121,7 +121,7 @@ func isLoggedIn(req events.APIGatewayProxyRequest) (*string, error) {
 		return nil, err
 	}
 
-	email, err := validateToken(data.secretString)
+	email, err := validateToken(*data)
 
 	if err != nil {
 		return nil, err
@@ -134,7 +134,7 @@ func Login(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, 
 	data, err := parseUser(req.Body)
 
 	if err != nil {
-		return apiResponse(http.StatusBadGateway, errorBody{aws.String("Sorry, something went wrong while parsing the request")})
+		return apiResponse(http.StatusBadGateway, errorBody{aws.String(err.Error())})
 	}
 
 	user := database.GetUser(data.Email)
@@ -156,7 +156,7 @@ func Login(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, 
 	}
 
 	secret := Secret{
-		secretString: *token,
+		SecretString: *token,
 	}
 
 	return apiResponse(http.StatusOK, secretResponse{secret})
@@ -176,7 +176,7 @@ func GetApiKey(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyRespon
 	}
 
 	secret := Secret{
-		secretString: user.ApiKey,
+		SecretString: user.ApiKey,
 	}
 
 	return apiResponse(http.StatusOK, secretResponse{secret})

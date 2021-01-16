@@ -15,7 +15,7 @@ func CreateUser(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyRespo
 	data, err := parseUser(req.Body)
 
 	if err != nil {
-		return apiResponse(http.StatusBadGateway, errorBody{aws.String("Sorry, something went wrong while parsing the request")})
+		return apiResponse(http.StatusBadGateway, errorBody{aws.String(err.Error())})
 	}
 
 	if len(data.Password) < 8 {
@@ -59,7 +59,11 @@ func CreateUser(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyRespo
 		return apiResponse(http.StatusBadRequest, errorBody{aws.String(err.Error())})
 	}
 
-	secret := Secret{secretString: *token}
+	secret := Secret{*token}
+
+	if err != nil {
+		return apiResponse(http.StatusBadGateway, errorBody{aws.String((err.Error()))})
+	}
 
 	return apiResponse(http.StatusCreated, secretResponse{secret})
 }
