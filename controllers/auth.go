@@ -137,7 +137,11 @@ func Login(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, 
 		return apiResponse(http.StatusBadGateway, errorBody{aws.String(err.Error())})
 	}
 
-	user := database.GetUser(data.Email)
+	user, err := database.GetUser(data.Email)
+
+	if err != nil {
+		return apiResponse(http.StatusBadGateway, errorBody{aws.String(err.Error())})
+	}
 
 	if user == nil {
 		return apiResponse(http.StatusBadRequest, errorBody{aws.String("User not found or incorrect password.")})
@@ -169,7 +173,11 @@ func GetApiKey(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyRespon
 		return apiResponse(http.StatusBadGateway, errorBody{aws.String(err.Error())})
 	}
 
-	user := database.GetUser(*email)
+	user, err := database.GetUser(*email)
+
+	if err != nil {
+		return apiResponse(http.StatusBadGateway, errorBody{aws.String(err.Error())})
+	}
 
 	if user == nil {
 		return apiResponse(http.StatusBadRequest, errorBody{aws.String("User not found.")})

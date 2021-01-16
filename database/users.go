@@ -1,8 +1,6 @@
 package database
 
-import "fmt"
-
-func GetUser(email string) *User {
+func GetUser(email string) (*User, error) {
 	db := GetDB()
 
 	var user User
@@ -10,9 +8,8 @@ func GetUser(email string) *User {
 	result := db.Where("email = ?", email).First(&user)
 
 	if result.Error != nil {
-		fmt.Println(result.Error)
-		return nil
+		return nil, result.Error
 	}
 
-	return &user
+	return &user, nil
 }
