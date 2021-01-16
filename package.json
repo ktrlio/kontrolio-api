@@ -9,8 +9,7 @@
     "removeunused": "go mod tidy",
     "build": "make",
     "serverless": "serverless",
-    "migrate": "yarn serverless invoke --function migrations",
-    "start": "yarn build && cd dist && yarn migrate && yarn serverless --stage dev offline --useDocker"
+    "start": "yarn build && cd dist && yarn serverless --stage dev offline"
   },
   "husky": {
     "hooks": {

@@ -129,8 +129,9 @@ custom:
     JWT_SECRET:
       prod: ${ssm:/kontrolio-jwt-secret~true}
   serverless-offline:
+    useDocker: true
     ignoreJWTSignature: true
     httpPort: 9000
   scripts:
     hooks:
-      "deploy:migrate": serverless invoke -f migrate
+      "deploy:runMigrations": serverless invoke -f migrations

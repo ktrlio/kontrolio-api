@@ -19,6 +19,7 @@ var (
 	SENDER_EMAIL      string
 	ENABLE_EMAIL_AUTH bool
 	JWT_SECRET        string
+	IS_OFFLINE        bool
 )
 
 func init() {
@@ -39,6 +40,7 @@ func init() {
 	CLIENT_URL = os.Getenv("CLIENT_URL")
 	SENDER_EMAIL = os.Getenv("SENDER_EMAIL")
 	JWT_SECRET = os.Getenv("JWT_SECRET")
+	IS_OFFLINE = os.Getenv("IS_OFFLINE") == "true"
 
 	if shouldEnableEmailAuth, err := strconv.Atoi(os.Getenv("ENABLE_EMAIL_AUTH")); err == nil {
 		ENABLE_EMAIL_AUTH = shouldEnableEmailAuth != 0
