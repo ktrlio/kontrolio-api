@@ -8,8 +8,6 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-var db *gorm.DB
-
 type Record struct {
 	gorm.Model
 	Uuid       uuid.UUID

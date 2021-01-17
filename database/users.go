@@ -1,6 +1,8 @@
 package database
 
-func GetUser(email string) (*User, error) {
+import "fmt"
+
+func GetUser(email string) *User {
 	db := GetDB()
 
 	var user User
@@ -8,8 +10,9 @@ func GetUser(email string) (*User, error) {
 	result := db.Where("email = ?", email).First(&user)
 
 	if result.Error != nil {
-		return nil, result.Error
+		fmt.Println(fmt.Errorf("Something went wrong while getting a user by email: %w", result.Error))
+		return nil
 	}
 
-	return &user, nil
+	return &user
 }

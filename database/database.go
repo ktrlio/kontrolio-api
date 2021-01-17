@@ -8,6 +8,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var db *gorm.DB
+
 func init() {
 	connectionString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", config.DB_HOST, config.DB_USER, config.DB_NAME, config.DB_PASSWORD)
 
