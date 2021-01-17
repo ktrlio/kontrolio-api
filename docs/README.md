@@ -38,6 +38,7 @@ Your AWS role must have the following permissions granted:
 - AmazonAPIGatewayAdministrator
 - AWSCloudFormationFullAccess
 - AWSLambda_FullAccess
+- AmazonSSMReadOnlyAccess
 
 ### Configuration
 

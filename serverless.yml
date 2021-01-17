@@ -11,11 +11,6 @@ provider:
   timeout: 2
   memorySize: 128
   stage: prod
-  iamRoleStatements:
-    - Effect: "Allow"
-      Action:
-        - "ssm:GetParameters"
-      Resource: "*"
   environment:
     ENV: ${self:custom.envVariables.ENV.${self:custom.currentStage}}
     DB_USER: ${self:custom.envVariables.DB_USER.${self:custom.currentStage}}
