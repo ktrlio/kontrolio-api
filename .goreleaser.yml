@@ -4,45 +4,33 @@ builds:
     binary: authorizer
     goos:
       - linux
-      - darwin
-      - windows
 
   - main: ./functions/create_record/create_record.go
     id: "create_record"
     binary: create_record
     goos:
       - linux
-      - darwin
-      - windows
 
   - main: ./functions/create_user/create_user.go
     id: "create_user"
     binary: create_user
     goos:
       - linux
-      - darwin
-      - windows
 
   - main: ./functions/get_api_key/get_api_key.go
     id: "get_api_key"
     binary: get_api_key
     goos:
       - linux
-      - darwin
-      - windows
 
   - main: ./functions/login/login.go
     id: "login"
     binary: login
     goos:
       - linux
-      - darwin
-      - windows
 
   - main: ./functions/migrations/migrations.go
     id: "migrations"
     binary: migrations
     goos:
       - linux
-      - darwin
-      - windows
