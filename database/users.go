@@ -10,7 +10,7 @@ func GetUser(email string) *User {
 	result := db.Where("email = ?", email).First(&user)
 
 	if result.Error != nil {
-		fmt.Println(fmt.Errorf("Something went wrong while getting a user by email: %w", result.Error))
+		fmt.Println("Something went wrong while getting a user by email: " + result.Error.Error())
 		return nil
 	}
 
