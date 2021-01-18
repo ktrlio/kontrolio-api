@@ -9,7 +9,7 @@ provider:
   runtime: go1.x
   lambdaHashingVersion: 20201221
   timeout: 20
-  memorySize: 128
+  memorySize: 256
   stage: prod
   environment:
     ENV: ${self:custom.envVariables.ENV.${self:custom.currentStage}}
