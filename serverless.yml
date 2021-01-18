@@ -131,6 +131,7 @@ custom:
   serverless-offline:
     ignoreJWTSignature: true
     httpPort: 9000
+    useDocker: true
   scripts:
     hooks:
       "deploy:finalize": serverless invoke -f migrations
