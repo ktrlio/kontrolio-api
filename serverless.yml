@@ -109,7 +109,7 @@ plugins:
   - serverless-plugin-scripts
 
 custom:
-  currentStage: ${opt:stage, self:provider.sta"2021-01-19T18:11:35.682Z"ge}
+  currentStage: ${opt:stage, self:provider.stage}
   envVariables:
     ENV:
       prod: production
