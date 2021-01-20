@@ -89,7 +89,8 @@ func signToken(email string) (*string, error) {
 func validateToken(tokenString string) (*string, error) {
 	parsedToken, err := strconv.Unquote(tokenString)
 
-	if err != nil {
+	if err != nil && err != strconv.ErrSyntax {
+		fmt.Println("Could not parse token: " + err.Error())
 		return nil, errors.New("Something went wrong while parsing your token.")
 	}
 
@@ -159,7 +160,7 @@ func Login(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, 
 		SecretString: *token,
 	}
 
-	return apiResponse(http.StatusOK, secretResponse{secret})
+	return apiResponse(http.StatusOK, secretResponseBody{secret})
 }
 
 func GetApiKey(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
@@ -179,5 +180,5 @@ func GetApiKey(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyRespon
 		SecretString: user.ApiKey,
 	}
 
-	return apiResponse(http.StatusOK, secretResponse{secret})
+	return apiResponse(http.StatusOK, secretResponseBody{secret})
 }

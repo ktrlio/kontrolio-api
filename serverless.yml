@@ -109,7 +109,7 @@ plugins:
   - serverless-plugin-scripts
 
 custom:
-  currentStage: ${opt:stage, self:provider.stage}
+  currentStage: ${opt:stage, self:provider.sta"2021-01-19T18:11:35.682Z"ge}
   envVariables:
     ENV:
       prod: production
@@ -125,7 +125,7 @@ custom:
     DB_PORT:
       prod: ${ssm:/kontrolio-db-port~true}
     SENDER_EMAIL:
-      prod: ${ssm:/kontrolio-sender-email~true}
+      prod: 0
     JWT_SECRET:
       prod: ${ssm:/kontrolio-jwt-secret~true}
   serverless-offline:

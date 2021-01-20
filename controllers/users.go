@@ -8,7 +8,6 @@ import (
 	"github.com/marcelovicentegc/kontrolio-api/config"
 	"github.com/marcelovicentegc/kontrolio-api/database"
 	"github.com/marcelovicentegc/kontrolio-api/utils"
-	uuid "github.com/satori/go.uuid"
 )
 
 func CreateUser(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
@@ -28,21 +27,7 @@ func CreateUser(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyRespo
 		return apiResponse(http.StatusBadRequest, errorBody{aws.String("Email already taken.")})
 	}
 
-	hashedPassword, err := utils.HashPassword(data.Password)
-
-	if err != nil {
-		return apiResponse(http.StatusBadRequest, errorBody{aws.String(err.Error())})
-	}
-
-	apiKey := uuid.NewV4().String()
-
-	user := database.User{Email: data.Email, Password: hashedPassword, ApiKey: apiKey}
-
-	result := database.GetDB().Create(&user)
-
-	if result.Error != nil {
-		return apiResponse(http.StatusBadRequest, errorBody{aws.String(result.Error.Error())})
-	}
+	err = database.InsertUser(data.Email, data.Password)
 
 	if config.ENABLE_EMAIL_AUTH {
 		utils.SendEMail(
@@ -53,7 +38,7 @@ func CreateUser(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyRespo
 			nil)
 	}
 
-	token, err := signToken(user.Email)
+	token, err := signToken(data.Email)
 
 	if err != nil {
 		return apiResponse(http.StatusBadRequest, errorBody{aws.String(err.Error())})
@@ -65,5 +50,5 @@ func CreateUser(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyRespo
 		return apiResponse(http.StatusBadGateway, errorBody{aws.String((err.Error()))})
 	}
 
-	return apiResponse(http.StatusCreated, secretResponse{secret})
+	return apiResponse(http.StatusCreated, secretResponseBody{secret})
 }
