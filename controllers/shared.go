@@ -9,49 +9,6 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 )
 
-type errorBody struct {
-	ErrorMsg *string `json:"error,omitempty"`
-}
-
-type responseBody struct {
-	Data *string `json:"data"`
-}
-
-type userResponseBody struct {
-	Data User `json:"data"`
-}
-
-type secretResponseBody struct {
-	Data Secret `json:"data"`
-}
-
-type recordResponseBody struct {
-	Data Record `json:"data"`
-}
-
-type recordRequestBody struct {
-	Data PartialRecord `json:"data"`
-}
-
-type User struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-type Secret struct {
-	SecretString string `json:"secretString"`
-}
-
-type PartialRecord struct {
-	Time   string `json:"time"`
-	ApiKey string `json:"apiKey"`
-}
-
-type Record struct {
-	Time       string `json:"time"`
-	RecordType string `json:"recordType"`
-}
-
 func apiResponse(status int, body interface{}) (*events.APIGatewayProxyResponse, error) {
 	resp := events.APIGatewayProxyResponse{Headers: map[string]string{"Content-Type": "application/json"}}
 	resp.StatusCode = status
@@ -73,6 +30,17 @@ func parseUser(body string) (*User, error) {
 	return &data.Data, nil
 }
 
+func ensureSecretIsUnderQuotes(secret string) string {
+	firstChar := string((secret)[0])
+	lastChar := string((secret)[len(secret)-1])
+
+	if firstChar != `"` && lastChar != firstChar {
+		secret = strconv.Quote(secret)
+	}
+
+	return secret
+}
+
 func parseSecret(body string) (*string, error) {
 	data := &responseBody{}
 	err := json.Unmarshal([]byte(body), data)
@@ -82,14 +50,33 @@ func parseSecret(body string) (*string, error) {
 		return nil, errors.New("Sorry, something went wrong while parsing the request.")
 	}
 
-	quotedSecret := *data.Data
-
-	firstChar := string((quotedSecret)[0])
-	lastChar := string((quotedSecret)[len(quotedSecret)-1])
-
-	if firstChar != `"` && lastChar != firstChar {
-		quotedSecret = strconv.Quote(quotedSecret)
-	}
+	quotedSecret := ensureSecretIsUnderQuotes(*data.Data)
 
 	return &quotedSecret, nil
+}
+
+func parseRecord(body string) (*PartialRecord, error) {
+	data := &recordRequestBody{}
+	err := json.Unmarshal([]byte(body), data)
+
+	if err != nil {
+		fmt.Println("Could not parse record object: " + err.Error())
+		return nil, errors.New("Sorry, something went wrong while parsing the request.")
+	}
+
+	return &data.Data, nil
+}
+
+func parseRecordsRequest(body string) (*RecordsRequestBody, error) {
+	data := &recordsRequestBody{}
+	err := json.Unmarshal([]byte(body), data)
+
+	if err != nil {
+		fmt.Println("Could not parse records filter object: " + err.Error())
+		return nil, errors.New("Sorry, something went wrong while parsing the request.")
+	}
+
+	data.Data.Auth.SecretString = ensureSecretIsUnderQuotes(data.Data.Auth.SecretString)
+
+	return &data.Data, nil
 }

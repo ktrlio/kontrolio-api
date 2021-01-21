@@ -109,22 +109,31 @@ func validateToken(tokenString string) (*string, error) {
 			return nil, errors.New("Unauthorized.")
 		}
 
+		// This is far from ideal, but unfortunately the go-jwt package
+		// doesn't expose this error type.
+		// Might be interesting to submit a PR for this @ https://github.com/dgrijalva/jwt-go/
+		if strings.Contains(err.Error(), "token is expired by") {
+			return nil, errors.New("Your session expired. Please log in again to refresh it.")
+		}
+
 		return nil, errors.New("Sorry, something went wrong on our end.")
 	}
 
 	return &claims.Email, nil
 }
 
-func isLoggedIn(req events.APIGatewayProxyRequest) (*string, error) {
-	data, err := parseSecret(req.Body)
+func isLoggedIn(jwtToken string) (*string, error) {
+	data, err := parseSecret(jwtToken)
 
 	if err != nil {
+		fmt.Println("[isLoggedIn [0]] failed with: ", err.Error())
 		return nil, err
 	}
 
 	email, err := validateToken(*data)
 
 	if err != nil {
+		fmt.Println("[isLoggedIn [1]] failed with: ", err.Error())
 		return nil, err
 	}
 
@@ -138,7 +147,7 @@ func Login(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, 
 		return apiResponse(http.StatusBadGateway, errorBody{aws.String(err.Error())})
 	}
 
-	user := database.GetUser(data.Email)
+	user := database.GetUserByEmail(data.Email)
 
 	if user == nil {
 		return apiResponse(http.StatusBadRequest, errorBody{aws.String("User not found or incorrect password.")})
@@ -164,13 +173,13 @@ func Login(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, 
 }
 
 func GetApiKey(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
-	email, err := isLoggedIn(req)
+	email, err := isLoggedIn(req.Body)
 
 	if err != nil {
 		return apiResponse(http.StatusBadGateway, errorBody{aws.String(err.Error())})
 	}
 
-	user := database.GetUser(*email)
+	user := database.GetUserByEmail(*email)
 
 	if user == nil {
 		return apiResponse(http.StatusBadRequest, errorBody{aws.String("User not found.")})

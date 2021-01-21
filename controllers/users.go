@@ -21,7 +21,7 @@ func CreateUser(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyRespo
 		return apiResponse(http.StatusBadRequest, errorBody{aws.String("Sorry, but the password must have at least 8 characters.")})
 	}
 
-	existentUser := database.GetUser(data.Email)
+	existentUser := database.GetUserByEmail(data.Email)
 
 	if existentUser != nil {
 		return apiResponse(http.StatusBadRequest, errorBody{aws.String("Email already taken.")})

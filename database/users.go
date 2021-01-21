@@ -7,7 +7,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-func GetUser(email string) *User {
+func GetUserByEmail(email string) *User {
 	db := GetDB()
 
 	var user User

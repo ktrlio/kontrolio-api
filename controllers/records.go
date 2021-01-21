@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
+	"math"
 	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -12,22 +12,8 @@ import (
 	"github.com/marcelovicentegc/kontrolio-api/utils"
 )
 
-func parseRecord(body string) (*PartialRecord, error) {
-	data := &recordRequestBody{}
-	err := json.Unmarshal([]byte(body), data)
-
-	if err != nil {
-		fmt.Println("Could not parse record object: " + err.Error())
-		return nil, errors.New("Sorry, something went wrong while parsing the request.")
-	}
-
-	return &data.Data, nil
-}
-
 func CreateRecord(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	parsedRecord, err := parseRecord(req.Body)
-
-	fmt.Println(parsedRecord)
 
 	if err != nil {
 		return apiResponse(http.StatusBadGateway, errorBody{aws.String(err.Error())})
@@ -59,4 +45,51 @@ func CreateRecord(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyRes
 	recordResponse := Record{newRecord.Time.Format(utils.RecordTimeFormat), newRecord.RecordType}
 
 	return apiResponse(http.StatusOK, recordResponseBody{recordResponse})
+}
+
+func GetRecords(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+	requestBody, err := parseRecordsRequest(req.Body)
+
+	if err != nil {
+		return apiResponse(http.StatusBadGateway, errorBody{aws.String(err.Error())})
+	}
+
+	formattedSecret, err := json.Marshal(responseBody{&requestBody.Auth.SecretString})
+
+	if err != nil {
+		return apiResponse(http.StatusBadGateway, errorBody{aws.String(err.Error())})
+	}
+
+	email, err := isLoggedIn(string(formattedSecret))
+
+	if err != nil {
+		return apiResponse(http.StatusBadGateway, errorBody{aws.String(err.Error())})
+	}
+
+	user := database.GetUserByEmail(*email)
+
+	if user == nil {
+		return apiResponse(http.StatusBadGateway, errorBody{aws.String("User not found.")})
+	}
+
+	records, count := database.GetRecords(
+		user.ID,
+		requestBody.Filter.Pagination.Limit,
+		requestBody.Filter.Pagination.Offset,
+		requestBody.Filter.DateRange.StartDate,
+		requestBody.Filter.DateRange.EndDate,
+	)
+
+	var response RecordsResponseBody
+
+	response.Count = count
+	response.CurrentPage = uint(math.Ceil(float64(requestBody.Filter.Pagination.Offset) / float64(requestBody.Filter.Pagination.Limit)))
+	response.TotalPages = uint(math.Ceil(float64(count) / float64(requestBody.Filter.Pagination.Limit)))
+
+	for _, record := range *records {
+		formattedRecord := Record{record.Time.Format(utils.RecordTimeFormat), record.RecordType}
+		response.Results = append(response.Results, formattedRecord)
+	}
+
+	return apiResponse(http.StatusOK, recordsResponseBody{response})
 }
