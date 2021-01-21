@@ -83,6 +83,24 @@ functions:
       include:
         - ./dist/get_records
 
+  getAllRecords:
+    handler: dist/get_all_records
+    events:
+      - httpApi:
+          path: /all-records
+          method: post
+          authorizers:
+            authorizer:
+              audience:
+                # https://github.com/dherault/serverless-offline/issues/1078#issuecomment-729681919
+                - abcxxxxxxx
+                - abcxxxxxxx
+    package:
+      exclude:
+        - ./**
+      include:
+        - ./dist/get_all_records
+
   login:
     handler: dist/login
     events:

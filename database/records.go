@@ -58,7 +58,7 @@ func InsertRecord(userId uint, clientTime string, recordType string) (*Record, e
 
 }
 
-func GetRecords(userId uint, limit uint, offset uint, startDate *time.Time, endDate *time.Time) (*[]Record, uint) {
+func QueryRecords(userId uint, limit uint, offset uint, startDate *time.Time, endDate *time.Time) (*[]Record, uint) {
 	db := GetDB()
 
 	var records []Record
@@ -71,4 +71,19 @@ func GetRecords(userId uint, limit uint, offset uint, startDate *time.Time, endD
 	}
 
 	return &records, uint(result.RowsAffected)
+}
+
+func QueryAllRecords(userId uint) *[]Record {
+	db := GetDB()
+
+	var records []Record
+
+	result := db.Where("user_id = ?", userId).Order("id DESC").Find(&records)
+
+	if result.Error != nil {
+		fmt.Println("[GetAllRecords query]: " + result.Error.Error())
+		return nil
+	}
+
+	return &records
 }

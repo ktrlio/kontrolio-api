@@ -26,6 +26,10 @@ type recordsResponseBody struct {
 	Data RecordsResponseBody `json:"data"`
 }
 
+type allRecordsResponseBody struct {
+	Data AllRecordsResponseBody `json:"data"`
+}
+
 type recordRequestBody struct {
 	Data PartialRecord `json:"data"`
 }
@@ -63,6 +67,10 @@ type RecordsResponseBody struct {
 	CurrentPage uint     `json:"currentPage"`
 	TotalPages  uint     `json:"totalPages"`
 	Results     []Record `json:"results"`
+}
+
+type AllRecordsResponseBody struct {
+	Results []Record `json:"results"`
 }
 
 type RecordsFilter struct {

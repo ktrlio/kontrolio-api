@@ -72,7 +72,7 @@ func GetRecords(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyRespo
 		return apiResponse(http.StatusBadGateway, errorBody{aws.String("User not found.")})
 	}
 
-	records, count := database.GetRecords(
+	records, count := database.QueryRecords(
 		user.ID,
 		requestBody.Filter.Pagination.Limit,
 		requestBody.Filter.Pagination.Offset,
@@ -92,4 +92,32 @@ func GetRecords(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyRespo
 	}
 
 	return apiResponse(http.StatusOK, recordsResponseBody{response})
+}
+
+// Gets all records. This function is only triggered by the CLI client,
+// in order to sync offline and online records.
+func GetAllRecords(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+	apiKey, err := parseSecret(req.Body)
+
+	if err != nil {
+		fmt.Println("[getAllRecords] failed with: ", err.Error())
+		return apiResponse(http.StatusBadRequest, errorBody{aws.String(err.Error())})
+	}
+
+	user := database.GetUserByApiKey(*apiKey)
+
+	if user == nil {
+		return apiResponse(http.StatusBadGateway, errorBody{aws.String("User not found.")})
+	}
+
+	records := database.QueryAllRecords(user.ID)
+
+	var response AllRecordsResponseBody
+
+	for _, record := range *records {
+		formattedRecord := Record{record.Time.Format(utils.RecordTimeFormat), record.RecordType}
+		response.Results = append(response.Results, formattedRecord)
+	}
+
+	return apiResponse(http.StatusOK, allRecordsResponseBody{response})
 }
