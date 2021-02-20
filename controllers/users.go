@@ -10,6 +10,7 @@ import (
 	"github.com/marcelovicentegc/kontrolio-api/utils"
 )
 
+// CreateUser is responsible for creating users
 func CreateUser(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	data, err := parseUser(req.Body)
 

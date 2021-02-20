@@ -38,20 +38,24 @@ type recordsRequestBody struct {
 	Data RecordsRequestBody `json:"data"`
 }
 
+// User holds user informations
 type User struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
+// Secret holds the secret string used to validate requests
 type Secret struct {
 	SecretString string `json:"secretString"`
 }
 
+// PartialRecord holds useful information for the API to create a record
 type PartialRecord struct {
 	Time   string `json:"time"`
-	ApiKey string `json:"apiKey"`
+	APIKey string `json:"apiKey"`
 }
 
+// Record holds useful information for the clients
 type Record struct {
 	Time       string `json:"time"`
 	RecordType string `json:"recordType"`

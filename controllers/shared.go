@@ -24,7 +24,7 @@ func parseUser(body string) (*User, error) {
 
 	if err != nil {
 		fmt.Println("Could not parse user object: " + err.Error())
-		return nil, errors.New("Sorry, something went wrong while parsing the request.")
+		return nil, errors.New("Sorry, something went wrong while parsing the request")
 	}
 
 	return &data.Data, nil
@@ -47,7 +47,7 @@ func parseSecret(body string) (*string, error) {
 
 	if err != nil {
 		fmt.Println("Could not parse secret object: " + err.Error())
-		return nil, errors.New("Sorry, something went wrong while parsing the request.")
+		return nil, errors.New("Sorry, something went wrong while parsing the request")
 	}
 
 	quotedSecret := ensureSecretIsUnderQuotes(*data.Data)
@@ -61,7 +61,7 @@ func parseRecord(body string) (*PartialRecord, error) {
 
 	if err != nil {
 		fmt.Println("Could not parse record object: " + err.Error())
-		return nil, errors.New("Sorry, something went wrong while parsing the request.")
+		return nil, errors.New("Sorry, something went wrong while parsing the request")
 	}
 
 	return &data.Data, nil
@@ -73,7 +73,7 @@ func parseRecordsRequest(body string) (*RecordsRequestBody, error) {
 
 	if err != nil {
 		fmt.Println("Could not parse records filter object: " + err.Error())
-		return nil, errors.New("Sorry, something went wrong while parsing the request.")
+		return nil, errors.New("Sorry, something went wrong while parsing the request")
 	}
 
 	data.Data.Auth.SecretString = ensureSecretIsUnderQuotes(data.Data.Auth.SecretString)

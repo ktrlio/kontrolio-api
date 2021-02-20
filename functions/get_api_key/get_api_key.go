@@ -6,5 +6,5 @@ import (
 )
 
 func main() {
-	lambda.Start(controllers.GetApiKey)
+	lambda.Start(controllers.GetAPIKey)
 }

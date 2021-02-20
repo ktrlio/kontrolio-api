@@ -12,6 +12,7 @@ import (
 	"github.com/marcelovicentegc/kontrolio-api/utils"
 )
 
+// CreateRecord creates a record.
 func CreateRecord(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	parsedRecord, err := parseRecord(req.Body)
 
@@ -19,7 +20,7 @@ func CreateRecord(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyRes
 		return apiResponse(http.StatusBadGateway, errorBody{aws.String(err.Error())})
 	}
 
-	user := database.GetUserByApiKey(parsedRecord.ApiKey)
+	user := database.GetUserByApiKey(parsedRecord.APIKey)
 
 	if user == nil {
 		return apiResponse(http.StatusBadGateway, errorBody{aws.String("User not found.")})
@@ -47,6 +48,7 @@ func CreateRecord(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyRes
 	return apiResponse(http.StatusOK, recordResponseBody{recordResponse})
 }
 
+// GetRecords gets paginated records.
 func GetRecords(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	requestBody, err := parseRecordsRequest(req.Body)
 
@@ -94,7 +96,7 @@ func GetRecords(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyRespo
 	return apiResponse(http.StatusOK, recordsResponseBody{response})
 }
 
-// Gets all records. This function is only triggered by the CLI client,
+// GetAllRecords gets all records. This function is only triggered by the CLI client,
 // in order to sync offline and online records.
 func GetAllRecords(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	apiKey, err := parseSecret(req.Body)

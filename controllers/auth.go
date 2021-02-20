@@ -17,14 +17,16 @@ import (
 	"github.com/marcelovicentegc/kontrolio-api/utils"
 )
 
+// CustomClaims contains the structure of the custom
+// JWT token claimer
 type CustomClaims struct {
 	Email string `json:"email"`
 	jwt.StandardClaims
 }
 
 // Help function to generate an IAM policy
-func generatePolicy(principalId, effect, resource string) events.APIGatewayCustomAuthorizerResponse {
-	authResponse := events.APIGatewayCustomAuthorizerResponse{PrincipalID: principalId}
+func generatePolicy(principalID, effect, resource string) events.APIGatewayCustomAuthorizerResponse {
+	authResponse := events.APIGatewayCustomAuthorizerResponse{PrincipalID: principalID}
 
 	if effect != "" && resource != "" {
 		authResponse.PolicyDocument = events.APIGatewayCustomAuthorizerPolicy{
@@ -48,6 +50,7 @@ func generatePolicy(principalId, effect, resource string) events.APIGatewayCusto
 	return authResponse
 }
 
+// Authorizer middleware responsible for managing third party APIs access to any controller.
 func Authorizer(ctx context.Context, event events.APIGatewayCustomAuthorizerRequest) (events.APIGatewayCustomAuthorizerResponse, error) {
 	token := event.AuthorizationToken
 	switch strings.ToLower(token) {
@@ -91,7 +94,7 @@ func validateToken(tokenString string) (*string, error) {
 
 	if err != nil && err != strconv.ErrSyntax {
 		fmt.Println("Could not parse token: " + err.Error())
-		return nil, errors.New("Something went wrong while parsing your token.")
+		return nil, errors.New("Something went wrong while parsing your token")
 	}
 
 	claims := &CustomClaims{}
@@ -106,17 +109,18 @@ func validateToken(tokenString string) (*string, error) {
 
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
-			return nil, errors.New("Unauthorized.")
+			return nil, errors.New("Unauthorized")
 		}
 
 		// This is far from ideal, but unfortunately the go-jwt package
 		// doesn't expose this error type.
 		// Might be interesting to submit a PR for this @ https://github.com/dgrijalva/jwt-go/
 		if strings.Contains(err.Error(), "token is expired by") {
-			return nil, errors.New("Your session expired. Please log in again to refresh it.")
+			return nil, errors.New("Your session expired. Please log in again to refresh it")
 		}
 
-		return nil, errors.New("Sorry, something went wrong on our end.")
+		fmt.Println("Token parsing error: ", err.Error())
+		return nil, errors.New("Sorry, something went wrong on our end")
 	}
 
 	return &claims.Email, nil
@@ -140,6 +144,7 @@ func isLoggedIn(jwtToken string) (*string, error) {
 	return email, nil
 }
 
+// Login is used to sign in users
 func Login(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	data, err := parseUser(req.Body)
 
@@ -172,7 +177,9 @@ func Login(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, 
 	return apiResponse(http.StatusOK, secretResponseBody{secret})
 }
 
-func GetApiKey(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+// GetAPIKey is responsible for providing the API key for clients to authenticate requests
+// without needing to sign in.
+func GetAPIKey(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	email, err := isLoggedIn(req.Body)
 
 	if err != nil {
