@@ -19,14 +19,17 @@ func newRecordTypeRegistry() *recordTypeRegistry {
 	}
 }
 
+// RecordTypeRegistry holds the record types: IN, or OUT
 var RecordTypeRegistry = newRecordTypeRegistry()
 
-func GetLastRecord(userId uint) *Record {
+// GetLastRecord gets the last entry. This is particularly useful to check whether
+// the next entry should be of type IN, or OUT
+func GetLastRecord(userID uint) *Record {
 	db := GetDB()
 
 	var record Record
 
-	result := db.Where("user_id = ?", userId).Last(&record)
+	result := db.Where("user_id = ?", userID).Last(&record)
 
 	if result.Error != nil {
 		fmt.Println("[GetLastRecord query]: " + result.Error.Error())
@@ -36,7 +39,8 @@ func GetLastRecord(userId uint) *Record {
 	return &record
 }
 
-func InsertRecord(userId uint, clientTime string, recordType string) (*Record, error) {
+// InsertRecord inserts a new record on the database
+func InsertRecord(userID uint, clientTime string, recordType string) (*Record, error) {
 	db := GetDB()
 
 	parsedTime, err := time.Parse(utils.RecordTimeFormat, clientTime)
@@ -45,7 +49,7 @@ func InsertRecord(userId uint, clientTime string, recordType string) (*Record, e
 		return nil, err
 	}
 
-	record := Record{UserID: userId, Time: parsedTime, RecordType: recordType}
+	record := Record{UserID: userID, Time: parsedTime, RecordType: recordType}
 
 	result := db.Create(&record)
 
@@ -58,27 +62,36 @@ func InsertRecord(userId uint, clientTime string, recordType string) (*Record, e
 
 }
 
-func QueryRecords(userId uint, limit uint, offset uint, startDate *time.Time, endDate *time.Time) (*[]Record, uint) {
+// QueryRecords query records considering the pagination settings
+func QueryRecords(userID uint, limit uint, offset uint, startDate *time.Time, endDate *time.Time) (*[]Record, uint) {
 	db := GetDB()
 
 	var records []Record
+    var count int64
 
-	result := db.Where("user_id = ?", userId).Limit(int(limit)).Offset(int(offset)).Order("id DESC").Find(&records)
+	countResult := db.Where("user_id = ?", userID).Find(&records).Count(&count)
+	result := db.Where("user_id = ?", userID).Limit(int(limit)).Offset(int(offset)).Order("id DESC").Find(&records)
 
-	if result.Error != nil {
-		fmt.Println("[GetRecords query]: " + result.Error.Error())
+	if countResult.Error != nil {
+		fmt.Println("[GetRecords query [1]]: " + result.Error.Error())
 		return nil, 0
 	}
 
-	return &records, uint(result.RowsAffected)
+	if result.Error != nil {
+		fmt.Println("[GetRecords query [2]]: " + result.Error.Error())
+		return nil, 0
+	}
+
+	return &records, uint(count)
 }
 
-func QueryAllRecords(userId uint) *[]Record {
+// QueryAllRecords simply gets every record ever saved
+func QueryAllRecords(userID uint) *[]Record {
 	db := GetDB()
 
 	var records []Record
 
-	result := db.Where("user_id = ?", userId).Order("id DESC").Find(&records)
+	result := db.Where("user_id = ?", userID).Order("id DESC").Find(&records)
 
 	if result.Error != nil {
 		fmt.Println("[GetAllRecords query]: " + result.Error.Error())
